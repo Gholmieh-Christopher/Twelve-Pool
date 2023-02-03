@@ -1,1 +1,1 @@
-from .bot import CompetitiveBot
+from .main import TwelvePool as CompetitiveBot
