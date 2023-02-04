@@ -126,7 +126,7 @@ def run():
         run_game(sc2.maps.get("TritonLE"),
                      [bot, Computer(Race.Zerg, Difficulty[args.ComputerDifficulty])],
                      realtime=args.Realtime,
-                     sc2_version=args.Sc2Version, )
+                     sc2_version=args.Sc2Version)
 
 
 # Start game
