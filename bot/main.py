@@ -149,7 +149,7 @@ class TwelvePool(BotAI):
                     and unit.type_id
                     not in self._workers
                 ).amount
-                * 2 + 8
+                * 2 + 8 + (self.townhalls.amount * 2)
                 and self.structures.of_type(UnitTypeId.SPAWNINGPOOL).ready.amount == 1
                 and self.workers.amount < 80
             ):
