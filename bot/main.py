@@ -99,7 +99,7 @@ class TwelvePool(BotAI):
             self.idle_queens.add(self.queen_registry[unit_tag])
         else:
             self.queen_registry[unit_tag] = unready_townhalls.closest_to(
-                self.queen_registry[unit_tag]
+                self.units.of_type(UnitTypeId.QUEEN).by_tag(self.queen_registry[unit_tag])
             )
 
         del self.queen_registry[unit_tag]
