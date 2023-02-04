@@ -149,9 +149,9 @@ class TwelvePool(BotAI):
                     and unit.type_id
                     not in self._workers
                 ).amount
-                * 2 + 8 + (self.townhalls.amount * 2)
+                * 2  + (self.townhalls.amount * 2) + 2
                 and self.structures.of_type(UnitTypeId.SPAWNINGPOOL).ready.amount == 1
-                and self.workers.amount < 80
+                and self.workers.amount < 48
             ):
                 for larva in self.units.of_type(UnitTypeId.LARVA).closer_than(
                     5, hatchery
@@ -200,7 +200,7 @@ class TwelvePool(BotAI):
 
             zergling.attack(self.enemy_start_locations[0])
 
-        if self.minerals >= 500:
+        if self.minerals >= 300:
             await self.expand_now(UnitTypeId.HATCHERY)
 
         for queen in self.idle_queens:
@@ -236,6 +236,9 @@ class TwelvePool(BotAI):
                 queen: Unit = self.units.of_type(UnitTypeId.QUEEN).find_by_tag(
                     self.queen_registry[hatchery.tag]
                 )
+                if queen is None:
+                    continue
+                
                 if queen.energy >= 25:
                     queen(AbilityId.EFFECT_INJECTLARVA, hatchery)
 
