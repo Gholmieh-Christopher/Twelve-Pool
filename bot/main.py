@@ -118,6 +118,8 @@ class TwelvePool(BotAI):
         self.drone_streak_max: int = 3
 
     async def on_step(self, iteration: int) -> None:
+        await self.distribute_workers()
+
         drone_streak: int = 0
         zerglings: Units = self.units.of_type(UnitTypeId.ZERGLING)
 
@@ -132,7 +134,10 @@ class TwelvePool(BotAI):
                 return None
 
             position: typing.Optional[Point2] = await self.find_placement(
-                UnitTypeId.SPAWNINGPOOL, near=self.townhalls.first.position.towards(self.game_info.map_center, 5)
+                UnitTypeId.SPAWNINGPOOL,
+                near=self.townhalls.first.position.towards(
+                    self.game_info.map_center, 5
+                ),
             )
             if position is None:
                 loguru.logger.info("No position available to construct spawning pool.")
@@ -146,16 +151,21 @@ class TwelvePool(BotAI):
                 and zerglings.amount
                 >= self.enemy_units.filter(
                     lambda unit: not unit.is_flying
-                    and unit.type_id
-                    not in self._workers
-                ).amount * 2 + (self.townhalls.amount * 2) + 8
+                    and unit.type_id not in self._workers
+                ).amount
+                * 2
+                + (self.townhalls.amount * 2)
+                + 8
                 and self.structures.of_type(UnitTypeId.SPAWNINGPOOL).ready.amount == 1
                 and self.workers.amount < 48
             ):
                 for larva in self.units.of_type(UnitTypeId.LARVA).closer_than(
                     5, hatchery
                 ):
-                    if self.can_afford(UnitTypeId.DRONE) and drone_streak < self.drone_streak_max:
+                    if (
+                        self.can_afford(UnitTypeId.DRONE)
+                        and drone_streak < self.drone_streak_max
+                    ):
                         larva.train(UnitTypeId.DRONE)
                         drone_streak += 1
 
@@ -237,9 +247,25 @@ class TwelvePool(BotAI):
                 )
                 if queen is None:
                     continue
-                
+
                 if queen.energy >= 25:
                     queen(AbilityId.EFFECT_INJECTLARVA, hatchery)
 
         for worker in self.workers:
             await self.speedmine_single(worker)
+
+        # Dealing with worker rushes:
+        enemy_workers: Units = self.enemy_units.filter(
+            lambda unit: unit.distance_to(self.townhalls.first) <= 30
+            and unit.type_id in self._workers
+            and unit.is_attacking
+        )
+        if any(enemy_workers):
+            for enemy_worker in enemy_workers:
+                my_worker: Unit = self.workers.filter(
+                    lambda worker: not worker.is_attacking
+                ).closest_to(enemy_worker)
+                if my_worker is None:
+                    return None
+
+                my_worker.attack(enemy_worker)
