@@ -148,8 +148,7 @@ class TwelvePool(BotAI):
                     lambda unit: not unit.is_flying
                     and unit.type_id
                     not in self._workers
-                ).amount
-                * 2  + (self.townhalls.amount * 2) + 2
+                ).amount * 2 + (self.townhalls.amount * 2) + 8
                 and self.structures.of_type(UnitTypeId.SPAWNINGPOOL).ready.amount == 1
                 and self.workers.amount < 48
             ):
