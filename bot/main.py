@@ -213,22 +213,27 @@ class TwelvePool(BotAI):
             await self.expand_now(UnitTypeId.HATCHERY)
 
         for queen in self.idle_queens:
+            queen_unit = self.units.of_type(UnitTypeId.QUEEN).find_by_tag(queen)
+            if queen_unit is None:
+                continue
+
             available: Units = self.townhalls.filter(
                 lambda townhall: townhall.tag not in self.queen_registry
             )
             if not any(available):
                 return None
-            townhall: Unit = available.closest_to(queen)
+            townhall: Unit = available.closest_to(queen_unit)
 
-            self.queen_registry[townhall.tag] = queen.tag
-            if queen.energy >= 25:
-                queen(AbilityId.EFFECT_INJECTLARVA, townhall)
+            self.queen_registry[townhall.tag] = queen
+            if queen_unit.energy >= 25:
+                queen_unit(AbilityId.EFFECT_INJECTLARVA, townhall)
             else:
-                queen.move(townhall)
-            self.idle_clean.add(queen.tag)
+                queen_unit.move(townhall)
+                
+            self.idle_clean.add(queen)
 
         for tag in self.idle_clean:
-            self.idle_clean.remove(tag)
+            self.idle_queens.remove(tag)
 
         self.idle_clean: set = set()
 
