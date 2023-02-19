@@ -17,7 +17,6 @@ from sc2.unit import Unit
 # > IDs:
 from sc2.ids.unit_typeid import UnitTypeId
 from sc2.ids.ability_id import AbilityId
-from sc2.ids.buff_id import BuffId
 
 # Typing:
 import typing
